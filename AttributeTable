@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esri Experience Builder Code Window</title>
+<!-- Load Esri JavaScript API -->
+<link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.24/"></script>
+<style>
+  #viewDiv {
+    height: 400px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<div id="viewDiv"></div>
+<script>
+require([
+  "esri/views/MapView",
+  "esri/WebMap",
+  "esri/widgets/Search",
+  "esri/widgets/Feature"
+], function(MapView, WebMap, Search, Feature) {
+  const webmap = new WebMap({
+    portalItem: {
+      id: "Map"
+    }
+  });
+
+  const view = new MapView({
+    container: "viewDiv",
+    map: webmap
+  });
+
+  const searchWidget = new Search({
+    view: view
+  });
+
+  view.ui.add(searchWidget, "top-right");
+
+  const featureWidget = new Feature({
+    view: view
+  });
+
+  view.ui.add(featureWidget, "bottom-right");
+
+  view.when(function() {
+    // Connect search widget to feature widget
+    searchWidget.on("select-result", function(event) {
+      featureWidget.graphic = event.result.feature;
+    });
+  });
+});
+</script>
+</body>
+</html>
