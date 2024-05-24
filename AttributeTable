@@ -1,58 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Esri Experience Builder Code Window</title>
-<!-- Load Esri JavaScript API -->
-<link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css">
-<script src="https://js.arcgis.com/4.24/"></script>
-<style>
-  #viewDiv {
-    height: 400px;
-    width: 100%;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcGIS Experience Builder Search Widget</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.25/"></script>
+    <style>
+        html, body, #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #popup-container {
+            display: none;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            z-index: 1000;
+        }
+        #search-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            padding: 10px;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-<div id="viewDiv"></div>
-<script>
-require([
-  "esri/views/MapView",
-  "esri/WebMap",
-  "esri/widgets/Search",
-  "esri/widgets/Feature"
-], function(MapView, WebMap, Search, Feature) {
-  const webmap = new WebMap({
-    portalItem: {
-      id: "Map"
-    }
-  });
-
-  const view = new MapView({
-    container: "viewDiv",
-    map: webmap
-  });
-
-  const searchWidget = new Search({
-    view: view
-  });
-
-  view.ui.add(searchWidget, "top-right");
-
-  const featureWidget = new Feature({
-    view: view
-  });
-
-  view.ui.add(featureWidget, "bottom-right");
-
-  view.when(function() {
-    // Connect search widget to feature widget
-    searchWidget.on("select-result", function(event) {
-      featureWidget.graphic = event.result.feature;
-    });
-  });
-});
-</script>
-</body>
-</html>
+    <div id="viewDiv"></div>
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button id="search-button">Search</button>
+    </div>
+    <div id="popup-container"></div>
+    <script>
