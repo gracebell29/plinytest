@@ -41,3 +41,74 @@
     </div>
     <div id="popup-container"></div>
     <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/tasks/QueryTask",
+            "esri/tasks/support/Query"
+        ], function (Map, MapView, FeatureLayer, QueryTask, Query) {
+            // Create the map
+            const map = new Map({
+                basemap: "topo-vector"
+            });
+
+            // Create the view
+            const view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-118.80500, 34.02700],
+                zoom: 13
+            });
+
+            // Define the URL to the feature service
+            /////////////////////const featureServiceUrl = "YOUR_FEATURE_SERVICE_URL";
+
+            // Create a feature layer (optional, for visualization)
+            const featureLayer = new FeatureLayer({
+                url: featureServiceUrl
+            });
+            map.add(featureLayer);
+
+            // Search functionality
+            const searchButton = document.getElementById('search-button');
+            const searchInput = document.getElementById('search-input');
+            const popupContainer = document.getElementById('popup-container');
+
+            searchButton.addEventListener('click', async () => {
+                const searchTerm = searchInput.value;
+                if (!searchTerm) return;
+
+                const queryTask = new QueryTask({
+                    url: featureServiceUrl
+                });
+
+                const query = new Query();
+                ///////////query.where = `ATTRIBUTE_NAME LIKE '%${searchTerm}%'`; // Replace ATTRIBUTE_NAME with the actual attribute
+                query.outFields = ["*"];
+                query.returnGeometry = true;
+
+                try {
+                    const results = await queryTask.execute(query);
+                    if (results.features.length > 0) {
+                        const feature = results.features[0];
+                        const attributes = feature.attributes;
+
+                        view.goTo(feature.geometry);
+
+                        // Display the popup
+                        popupContainer.style.display = 'block';
+                        popupContainer.innerHTML = Object.entries(attributes)
+                            .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
+                            .join('');
+                    } else {
+                        popupContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Search failed: ", error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
